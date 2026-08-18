@@ -22,13 +22,14 @@ int main()
         cin >> n;
         string s;
         cin >> s;
- 
+
         ll LeftMaxCompress = 1;
         ll RightMaxCompress = 1;
 
         for (int i = 3; i < n; i++)
         {
-            if (s[i] != s[i - 1]){
+            if (s[i] != s[i - 1])
+            {
                 RightMaxCompress++;
             }
         }
