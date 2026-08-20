@@ -4,17 +4,57 @@ using ll = long long;
 using ull = unsigned long long;
 #define all(x) x.begin(), x.end()
 
-int dx[4] = {1, 0, -1, 0};
-int dy[4] = {0, -1, 0, 1};
-
-int main()
+inline void optimize()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+}
 
-    ll n, m;
+int n, m;
+const int N = 55;
+char graph[N][N];
+
+bool vis[N][N];
+int dx[4] = {1, 0, -1, 0};
+int dy[4] = {0, 1, 0, -1};
+
+bool DFS(int x, int y, int px, int py)
+{
+
+    vis[x][y] = true;
+
+    for (int k = 0; k < 4; k++)
+    {
+        int nx = x + dx[k];
+        int ny = y + dy[k];
+
+        if (nx >= 1 && nx <= n && ny >= 1 && ny <= m)
+        {
+            if (graph[nx][ny] == graph[x][y] && !(nx == px && ny == py))
+            {
+                if (vis[nx][ny])
+                {
+                    // 遇到环
+                    return true;
+                }
+                else
+                {
+                    if (DFS(nx, ny, x, y))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+int main()
+{
+    optimize();
+
     cin >> n >> m;
-    vector<vector<char>> graph(n + 1, vector<char>(m + 1));
     for (int i = 1; i <= n; i++)
     {
         string line;
@@ -25,46 +65,9 @@ int main()
         }
     }
 
-    vector<vector<int>> vis(n + 1, vector<int>(m + 1, 0));
+    memset(vis, 0, sizeof(vis));
 
-    auto DFS = [&](auto &&self, int x, int y, int lastX, int lastY) -> bool
-    {
-        vis[x][y]=1;//进入dfs立即标记
-
-        for (int k = 0; k < 4; k++)
-        {
-            int nx = x + dx[k];
-            int ny = y + dy[k];
-
-            
-            if (nx >= 1 && nx <= n && ny >= 1 && ny <= m && graph[nx][ny] == graph[x][y])
-            { // 先判合法性
-                if ((nx == lastX && ny == lastY))
-                {
-                    continue; // 跳过父节点
-                }
-                if (vis[nx][ny]==0)
-                {
-                    // 递归下去
-                    vis[nx][ny]=true;
-                    if(self(self,nx,ny,x,y)){//注意这个
-                        return true;
-                    }
-                }
-                else if (vis[nx][ny]==1)
-                {
-                    // 找到环返回true
-                    return true;
-                }
-            }else{
-                continue;
-            }
-        }
-        // 四个方向递归完都没反应
-        return false;
-    };
-
-    bool Found = false;
+    bool ok = false;
 
     for (int i = 1; i <= n; i++)
     {
@@ -72,23 +75,20 @@ int main()
         {
             if (!vis[i][j])
             {
-                vis[i][j]=1;
-                bool Cycle = DFS(DFS, i, j, -1, -1); // 棍母做父节点
-                if (Cycle)
+                if (DFS(i, j, -1, -1))
                 {
-                    Found = true;
+                    ok = true;
                     break;
                 }
-               // vis[i][j]=1;
             }
         }
-        if (Found)
+        if (ok)
         {
             break;
         }
     }
 
-    cout<<(Found?"Yes\n":"No\n");
+    cout << (ok ? "Yes\n" : "No\n");
 
     return 0;
 }
